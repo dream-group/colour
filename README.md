@@ -1,2 +1,4 @@
 # colour
-Tiny colour manipulation library
+Tiny class to represent a colour entity and perform basic transformations.
+
+
