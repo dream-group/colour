@@ -8,8 +8,8 @@
     },
     "type": "library",
     "autoload": {
-        "psr-0": {
-            "Dream": "src"
+        "psr-4": {
+            "Dream\\": "src"
         }
     }
 }

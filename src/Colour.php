@@ -11,7 +11,7 @@
  * 
  */
 
-namespace Dream\Colour;
+namespace Dream;
 
 use InvalidArgumentException;
 use LogicException;
