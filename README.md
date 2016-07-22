@@ -14,7 +14,7 @@ The class is meant to represent the abstract 'colour' entity. So that it is a go
 It is possible to construct the object either directly from the constructor, specifying RGB or HSV values:
 
 ```php
-use Dream\Colour
+use Dream\Colour;
 $colour = new Colour(255, 255, 255, Colour::RGB);
 $colour = new Colour(129, 0.5, 1.0, Colour::HSV);
 ```
@@ -24,7 +24,7 @@ Note the the HSV values for S and V are represented by a fraction from 0 ... 1.0
 A more sensible way to instantiate the object is to factory from the hex value:
 
 ```php
-use Dream\Colour
+use Dream\Colour;
 $colour = Colour::factoryHex('#aA1144');
 ```
 
