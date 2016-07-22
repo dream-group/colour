@@ -1,5 +1,5 @@
 {
-    "name": "lauri-elevant/colour",
+    "name": "dream-group/colour",
     "description": "Tiny class to represent a colour entity and perform basic transformations.",
 	"keywords": ["colour", "colour", "convert", "hex", "rgb", "hsl"],
     "license": "MIT",
