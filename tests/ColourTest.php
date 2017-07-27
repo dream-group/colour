@@ -2,7 +2,14 @@
 
 use Dream\Colour;
 
-class ColourTest extends PHPUnit_Framework_TestCase
+// Alias the PHPUnit 6.0 ancestor if available, else fall back to legacy ancestor
+if (class_exists('\PHPUnit\Framework\TestCase', true)) {
+    class ColourTestAncestor extends \PHPUnit\Framework\TestCase {}
+} else {
+    class ColourTestAncestor extends \PHPUnit_Framework_TestCase {}
+}
+
+class ColourTest extends ColourTestAncestor
 {
 	
     public function testWebValidation()
