@@ -2,13 +2,12 @@
 
 /*
  * A lightweight class for working with colours.
- * 
+ *
  * Works in either RGB or HSV mode and also supports the complete list of web colours.
  * Does not require any dependencies.
- * 
+ *
  * @package DreamLibrary
  * @author Lauri Elevant <lauri.elevant@dreamgroup.info>
- * 
  */
 
 namespace Dream;
@@ -16,11 +15,18 @@ namespace Dream;
 use InvalidArgumentException;
 use LogicException;
 
-class Colour
+/**
+ * @property float $R
+ * @property float $G
+ * @property float $B
+ * @property float $H
+ * @property float $S
+ * @property float $V
+ */
+final class Colour
 {
-
-    const RGB = 'RGB';
-    const HSV = 'HSV';
+    public const RGB = 'RGB';
+    public const HSV = 'HSV';
 
     /**
      * Mapping of web names to RGB values.
@@ -190,7 +196,7 @@ class Colour
      * @return bool
      */
 
-    public static function isWeb($web): bool
+    public static function isWeb(string $web): bool
     {
         $web = strtolower($web);
 
@@ -274,16 +280,16 @@ class Colour
      *
      * Just use $colour->R to get the red component.
      *
-     * @param string $n One of: R,G,B,H,S,V
+     * @param string $name One of: R,G,B,H,S,V
      * @return float
      * @throws InvalidArgumentException
      */
 
-    public function __get($n): float
+    public function __get(string $name): float
     {
-        $n = strtoupper($n);
+        $name = strtoupper($name);
 
-        switch ($n) {
+        switch ($name) {
 
             case 'H':
                 $this->_flip(self::HSV);
@@ -317,38 +323,42 @@ class Colour
      *
      * Just use $colour->R to set the red component.
      *
-     * @param string $n One of: R,G,B,H,S,V
-     * @param float $v the colour component value
-     * @return float the value actually set
+     * @param string $name One of: R,G,B,H,S,V
+     * @param float $value the colour component value
      * @throws InvalidArgumentException
      */
 
-    public function __set(string $n, float $v)
+    public function __set(string $name, float $value): void
     {
-        $n = strtoupper($n);
+        $name = strtoupper($name);
 
-        switch ($n) {
+        switch ($name) {
 
             case 'H':
                 $this->_flip(self::HSV);
-                return $this->_p1 = self::_bounds($v, 0, 360);
+                $this->_p1 = self::_bounds($value, 0, 360);
+                return;
             case 'S':
                 $this->_flip(self::HSV);
-                return $this->_p2 = self::_bounds($v, 0, 1);
+                $this->_p2 = self::_bounds($value, 0, 1);
+                return;
             case 'V':
                 $this->_flip(self::HSV);
-                return $this->_p3 = self::_bounds($v, 0, 1);
+                $this->_p3 = self::_bounds($value, 0, 1);
+                return;
 
             case 'R':
                 $this->_flip(self::RGB);
-                return $this->_p1 = self::_bounds($v, 0, 255);
+                $this->_p1 = self::_bounds($value, 0, 255);
+                return;
             case 'G':
                 $this->_flip(self::RGB);
-                return $this->_p2 = self::_bounds($v, 0, 255);
+                $this->_p2 = self::_bounds($value, 0, 255);
+                return;
             case 'B':
                 $this->_flip(self::RGB);
-                return $this->_p3 = self::_bounds($v, 0, 255);
-
+                $this->_p3 = self::_bounds($value, 0, 255);
+                return;
         }
 
         throw new InvalidArgumentException('Set what?');
@@ -365,7 +375,7 @@ class Colour
      * @throws LogicException
      */
 
-    private function _flip(string $to)
+    private function _flip(string $to): void
     {
         if ($this->_type == $to) {
             return;
@@ -375,14 +385,13 @@ class Colour
 
             case self::RGB:
                 $this->_type = self::HSV;
-                list($this->_p1, $this->_p2, $this->_p3) = self::_rgb2hsv($this->_p1, $this->_p2, $this->_p3);
+                [$this->_p1, $this->_p2, $this->_p3] = self::_rgb2hsv($this->_p1, $this->_p2, $this->_p3);
                 return;
 
             case self::HSV:
                 $this->_type = self::RGB;
-                list($this->_p1, $this->_p2, $this->_p3) = self::_hsv2rgb($this->_p1, $this->_p2, $this->_p3);
+                [$this->_p1, $this->_p2, $this->_p3] = self::_hsv2rgb($this->_p1, $this->_p2, $this->_p3);
                 return;
-
         }
 
         throw new LogicException('Flip failed');
@@ -401,14 +410,6 @@ class Colour
         $this->_flip(self::RGB);
 
         return '#' . sprintf("%02X%02X%02X", $this->_p1, $this->_p2, $this->_p3);
-
-        // the above is faster and guarantees #+3*2 format
-
-        $hex = base_convert($this->_p1, 10, 16)
-             . base_convert($this->_p2, 10, 16)
-             . base_convert($this->_p3, 10, 16);
-
-        return '#' . $hex;
     }
 
     /**
@@ -433,11 +434,9 @@ class Colour
 
     /**
      * A magic alias to getHex()
-     *
-     * @return string
      */
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getHex();
     }
@@ -507,7 +506,7 @@ class Colour
         } else {
 
             $v *= 255;
-            $h = ($h %= 360) / 60;
+            $h = (floor($h) % 360) / 60;
             $i = floor($h);
             $f = $h - $i;
 
@@ -525,22 +524,6 @@ class Colour
         }
 
     }
-
-
-    /**
-     * Not sure why this seemed useful..
-     */
-
-    /*private static function _int2rgb($int) {
-
-        $r = ($int >> 16) & 0xFF;
-        $g = ($int >> 8)  & 0xFF;
-        $b = ($int)       & 0xFF;
-
-        return [$r,$g,$b];
-
-    }*/
-
 
     /**
      *    This method checks whether a value is within

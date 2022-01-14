@@ -1,24 +1,19 @@
 <?php
 
+namespace Dream\Colour\Tests;
+
 use Dream\Colour;
+use PHPUnit\Framework\TestCase;
 
-// Alias the PHPUnit 6.0 ancestor if available, else fall back to legacy ancestor
-if (class_exists('\PHPUnit\Framework\TestCase', true)) {
-    class ColourTestAncestor extends \PHPUnit\Framework\TestCase {}
-} else {
-    class ColourTestAncestor extends \PHPUnit_Framework_TestCase {}
-}
-
-class ColourTest extends ColourTestAncestor
+class ColourTest extends TestCase
 {
-
-    public function testWebValidation()
+    public function testWebValidation(): void
     {
         $this->assertEquals(Colour::isWeb('turquoise'), true);
         $this->assertEquals(Colour::isWeb('foobar'), false);
     }
 
-    public function testHexValidation()
+    public function testHexValidation(): void
     {
         $this->assertEquals(Colour::isHex('#fafafa'), true);
         $this->assertEquals(Colour::isHex('#FAFAFA'), true);
@@ -26,7 +21,7 @@ class ColourTest extends ColourTestAncestor
         $this->assertEquals(Colour::isHex('#fafafX'), false);
     }
 
-    public function testHexFactory()
+    public function testHexFactory(): void
     {
         $colour = Colour::factoryHex('#aA1144');
         $this->assertEquals($colour->R, 170);
@@ -36,7 +31,7 @@ class ColourTest extends ColourTestAncestor
         $this->assertEquals((string)$colour, '#AA1144');
     }
 
-    public function testRGB()
+    public function testRGB(): void
     {
         $colour = Colour::factoryHex('#aA1144');
         $colour->R = 30;
@@ -48,7 +43,7 @@ class ColourTest extends ColourTestAncestor
         $this->assertEquals((string)$colour, '#1E2832');
     }
 
-    public function testHSV()
+    public function testHSV(): void
     {
         $colour = Colour::factoryHex('#000000');
         $colour->H = 123;
@@ -201,10 +196,9 @@ class ColourTest extends ColourTestAncestor
         $this->assertEquals($colour->H, 240);
         $this->assertEquals($colour->S, 1);
         $this->assertEquals(round($colour->V, 2), 0.50);
-
     }
 
-    public function testRGBBounds()
+    public function testRGBBounds(): void
     {
         $colour = Colour::factoryHex('#aA1144');
         $colour->R = 1001;
@@ -216,7 +210,7 @@ class ColourTest extends ColourTestAncestor
         $this->assertEquals((string)$colour, '#FF0000');
     }
 
-    public function testHSVBounds()
+    public function testHSVBounds(): void
     {
         $colour = Colour::factoryHex('#000000');
 
@@ -252,10 +246,9 @@ class ColourTest extends ColourTestAncestor
         $this->assertEquals($colour->V, 1);
         $colour->V = 1.01;
         $this->assertEquals($colour->V, 1);
-
     }
 
-    public function testBrightness()
+    public function testBrightness(): void
     {
         $colour = Colour::factoryHex('#aabbcc');
         $this->assertEquals($colour->getBrightness(), 184);
@@ -264,5 +257,4 @@ class ColourTest extends ColourTestAncestor
         $colour = Colour::factoryHex('#ffffff');
         $this->assertEquals($colour->getBrightness(), 255);
     }
-
 }
