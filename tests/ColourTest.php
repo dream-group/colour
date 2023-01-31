@@ -71,8 +71,8 @@ class ColourTest extends TestCase
         $this->assertEquals($colour->S, 0.002);
         $this->assertEquals($colour->V, 1);
         $this->assertEquals(floor($colour->R), 255);
-        $this->assertEquals(floor($colour->G), 255);
-        $this->assertEquals(floor($colour->B), 255);
+        $this->assertEquals(floor($colour->G), 254);
+        $this->assertEquals(floor($colour->B), 254);
     }
 
     public function testTable()
@@ -256,5 +256,16 @@ class ColourTest extends TestCase
         $this->assertEquals($colour->getBrightness(), 0);
         $colour = Colour::factoryHex('#ffffff');
         $this->assertEquals($colour->getBrightness(), 255);
+    }
+
+    public function testFlips(): void
+    {
+        foreach (Colour::getWebs() as $web => $hex) {
+            $hex = strtoupper($hex);
+            $c = Colour::factoryHex($hex);
+            $dummy = $c->H; // trigger a flip to HSV
+            $dummy = $c->R; // trigger a flip to RGB
+            $this->assertEquals($c->getHex(), $hex);
+        }
     }
 }

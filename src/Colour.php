@@ -409,7 +409,7 @@ final class Colour
     {
         $this->_flip(self::RGB);
 
-        return '#' . sprintf("%02X%02X%02X", $this->_p1, $this->_p2, $this->_p3);
+        return '#' . sprintf("%02X%02X%02X", round($this->_p1), round($this->_p2), round($this->_p3));
     }
 
     /**
