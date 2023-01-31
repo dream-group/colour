@@ -190,6 +190,18 @@ final class Colour
 
 
     /**
+     * Lists all the web safe colours that this library supports
+     * @return array
+     */
+
+    public static function getWebs(): array
+    {
+        return self::$_web;
+    }
+
+
+
+    /**
      * Validates a colour webname
      *
      * @param string $web Web colour name to be evaluated
@@ -495,34 +507,41 @@ final class Colour
 
     private static function _hsv2rgb(float $h, float $s, float $v): array
     {
-        if ($s <= 0.002) { // determined empirically
+        $h /= 360;
+        $h *= 6;
 
-            return [
-                round($v * 255),
-                round($v * 255),
-                round($v * 255)
-            ];
+        $i = floor($h);
+        $f = $h - $i;
 
-        } else {
+        $m = $v * (1 - $s);
+        $n = $v * (1 - $s * $f);
+        $k = $v * (1 - $s * (1 - $f));
 
-            $v *= 255;
-            $h = (floor($h) % 360) / 60;
-            $i = floor($h);
-            $f = $h - $i;
-
-            $q[0] = $q[1] = $v * (1 - $s);
-            $q[2] = $v * (1 - $s * (1 - $f));
-            $q[3] = $q[4] = $v;
-            $q[5] = $v * (1 - $s * $f);
-
-            return [
-                $q[($i + 4) % 6],
-                $q[($i + 2) % 6],
-                $q[$i % 6]
-            ];
-
+        switch ($i) {
+            case 0:
+                [$r,$g,$b] = [$v,$k,$m];
+                break;
+            case 1:
+                [$r,$g,$b] = [$n,$v,$m];
+                break;
+            case 2:
+                [$r,$g,$b] = [$m,$v,$k];
+                break;
+            case 3:
+                [$r,$g,$b] = [$m,$n,$v];
+                break;
+            case 4:
+                [$r,$g,$b] = [$k,$m,$v];
+                break;
+            case 5:
+            case 6: //for when $H=1 is given
+                [$r,$g,$b] = [$v,$m,$n];
+                break;
+            default:
+                throw new \Exception('CSV to RGB conversion fail');
         }
 
+        return [$r * 255, $g * 255, $b * 255];
     }
 
     /**
