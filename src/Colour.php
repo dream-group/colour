@@ -442,7 +442,92 @@ final class Colour
         );
 
     }
+    
+    /**
+     * Calculates the luminosity of an given RGB colour.
+     * The luminosity equations are from the WCAG 2 requirements:
+     * http://www.w3.org/TR/WCAG20/#relativeluminancedef
+     *
+     * @return float
+     */
 
+    public function getLuminosity(): float
+    {
+        $this->_flip(self::RGB);
+
+        $r = $this->_p1 / 255; // R
+        $g = $this->_p2 / 255; // G
+        $b = $this->_p3 / 255; // B
+
+        if ($r <= 0.03928) {
+            $r = $r / 12.92;
+        } else {
+            $r = pow(($r + 0.055) / 1.055, 2.4);
+        }
+
+        if ($g <= 0.03928) {
+            $g = $g / 12.92;
+        } else {
+            $g = pow(($g + 0.055) / 1.055, 2.4);
+        }
+
+        if ($b <= 0.03928) {
+            $b = $b / 12.92;
+        } else {
+            $b = pow(($b + 0.055) / 1.055, 2.4);
+        }
+
+        return 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
+    }
+
+    /**
+     * Calculates the luminosity ratio of two colours.
+     * The luminosity ratio equations are from the WCAG 2 requirements:
+     * http://www.w3.org/TR/WCAG20/#contrast-ratiodef
+     *
+     * @param Colour $color
+     * @return float
+     */
+
+    function compareLuminosity(self $color): float
+    {
+        $l1 = $this->getLuminosity();
+        $l2 = $color->getLuminosity();
+
+        if ($l1 > $l2) {
+            $ratio = (($l1 + 0.05) / ($l2 + 0.05));
+        } else {
+            $ratio = (($l2 + 0.05) / ($l1 + 0.05));
+        }
+
+        return $ratio;
+    }
+
+    /**
+     * Tests the colour contrast based on the specified WCAG level.
+     * The ratio levels are from the WCAG 2 requirements
+     * http://www.w3.org/TR/WCAG20/#visual-audio-contrast (1.4.3)
+     * http://www.w3.org/TR/WCAG20/#larger-scaledef
+     *
+     * @param string $level
+     * @param bool $large
+     * @param Colour $color
+     * @param float|null $ratio
+     * @return bool true if acceptable, false if not
+     */
+
+    function testWcag(string $level, bool $large, self $color, ?float &$ratio = null): bool
+    {
+        $ratio = $this->compareLuminosity($color);
+
+        $minimum = match ($level) {
+            'AA'  => $large ? 3.0 : 4.5,
+            'AAA' => $large ? 7.0 : 4.5,
+            default => throw new \Exception('Unknown WCAG level'),
+        };
+
+        return $ratio > ($minimum - PHP_FLOAT_EPSILON);
+    }
 
     /**
      * A magic alias to getHex()
