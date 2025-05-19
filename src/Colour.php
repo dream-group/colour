@@ -489,7 +489,7 @@ final class Colour
      * @return float
      */
 
-    function compareLuminosity(self $color): float
+    public function compareLuminosity(self $color): float
     {
         $l1 = $this->getLuminosity();
         $l2 = $color->getLuminosity();
@@ -516,7 +516,7 @@ final class Colour
      * @return bool true if acceptable, false if not
      */
 
-    function testWcag(string $level, bool $large, self $color, ?float &$ratio = null): bool
+    public function testWcag(string $level, bool $large, self $color, ?float &$ratio = null): bool
     {
         $ratio = $this->compareLuminosity($color);
 
@@ -527,6 +527,41 @@ final class Colour
         };
 
         return $ratio > ($minimum - PHP_FLOAT_EPSILON);
+    }
+
+    /**
+     * Calculates the luminosity ratio of each of the supplied colours
+     * against the colour itself, and picks the one that provides the
+     * best contrast according to WCAG 2 rules. If thwo colours offer
+     * the same contrast ratio, the first one is preferred.
+     * The luminosity ratio equations are from the WCAG 2 requirements:
+     * http://www.w3.org/TR/WCAG20/#contrast-ratiodef
+     *
+     * @param Colour[] $colours
+     * @return Colour
+     */
+
+    public function maximiseWcagContrast(array $colours): self
+    {
+        if (count($colours) < 2) {
+            throw new InvalidArgumentException('Expecting at least 2 colours');
+        }
+
+        $bestColour = null;
+        $bestRatio  = null;
+
+        foreach ($colours as $colour) {
+
+            $ratio = $this->compareLuminosity($colour);
+
+            if ($bestRatio === null || $ratio > $bestRatio) {
+                $bestColour = $colour;
+                $bestRatio  = $ratio;
+            }
+
+        }
+
+        return $bestColour;
     }
 
     /**
